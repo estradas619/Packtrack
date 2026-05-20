@@ -12,11 +12,14 @@ workflows:
           flutter pub get
       - name: Build APK (debug)
         script: |
-          flutter build apk --debug
-          mkdir -p $CM_BUILD_DIR/artifacts
-          find build -name "*.apk" -type f -exec cp {} $CM_BUILD_DIR/artifacts/ \;
-          ls -la $CM_BUILD_DIR/artifacts/
+          cd android
+          ./gradlew assembleDebug
+          cd ..
+          echo "=== APK files generated ==="
+          find build -name "*.apk" -type f
+          mkdir -p $CM_BUILD_DIR/apk_output
+          find build -name "*.apk" -type f -exec cp {} $CM_BUILD_DIR/apk_output/ \;
+          ls -la $CM_BUILD_DIR/apk_output/
     artifacts:
-      - artifacts/*.apk
-      - build/**/*.apk
-      - build/**/*.aab
+      - apk_output/*.apk
+      - build/**/outputs/**/*.apk
