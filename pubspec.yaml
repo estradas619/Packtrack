@@ -1,0 +1,85 @@
+name: packtrack
+description: A minimal and clean package tracking application.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.1
+
+  # Firebase
+  firebase_core: ^2.24.2
+  cloud_firestore: ^4.14.0
+  firebase_auth: ^4.16.0
+
+  # Maps
+  google_maps_flutter: ^2.5.3
+
+  # Local Storage
+  shared_preferences: ^2.2.2
+  sqflite: ^2.3.2
+  path: ^1.8.3
+
+  # Networking
+  http: ^1.2.0
+  dio: ^5.4.0
+
+  # UI Components
+  flutter_svg: ^2.0.9
+  shimmer: ^3.0.0
+  cached_network_image: ^3.3.1
+  lottie: ^3.0.0
+
+  # Barcode/QR Scanner
+  mobile_scanner: ^4.0.1
+
+  # Share
+  share_plus: ^7.2.1
+
+  # Social Login
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.0
+
+  # URL Launcher (for phone calls)
+  url_launcher: ^6.2.4
+
+  # Internationalization
+  intl: ^0.19.0
+
+  # Utils
+  uuid: ^4.3.3
+  timeago: ^3.6.1
+
+  # In-App Purchases
+  in_app_purchase: ^3.1.13
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/translations/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
