@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/localization/app_localizations.dart';
@@ -78,7 +77,7 @@ class _LiveMapCarouselState extends State<LiveMapCarousel> {
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
                 },
-                itemCount: sorted.length.clamp(0, 3), // Show max 3 maps
+                itemCount: sorted.length.clamp(0, 3),
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -146,7 +145,6 @@ class _MapCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          // Map placeholder (in production, use GoogleMap widget)
           if (hasCoordinates)
             _buildMapPlaceholder()
           else
@@ -171,7 +169,6 @@ class _MapCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  // Truck icon
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
@@ -185,7 +182,6 @@ class _MapCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  // Package info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +208,6 @@ class _MapCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // ETA badge
                   if (package.estimatedDelivery != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -288,15 +283,6 @@ class _MapCard extends StatelessWidget {
   }
 
   Widget _buildMapPlaceholder() {
-    // In production, replace with actual GoogleMap widget:
-    // GoogleMap(
-    //   initialCameraPosition: CameraPosition(
-    //     target: LatLng(package.currentLatitude!, package.currentLongitude!),
-    //     zoom: 12,
-    //   ),
-    //   markers: {...},
-    //   polylines: {...},
-    // )
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -382,7 +368,6 @@ class _MapRoutePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    // Draw a curved path from left to right (representing the route)
     final path = Path();
     path.moveTo(size.width * 0.15, size.height * 0.6);
     path.cubicTo(
@@ -393,7 +378,6 @@ class _MapRoutePainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
 
-    // Draw the "traveled" portion
     final traveledPath = Path();
     traveledPath.moveTo(size.width * 0.15, size.height * 0.6);
     traveledPath.cubicTo(
@@ -403,14 +387,12 @@ class _MapRoutePainter extends CustomPainter {
     );
     canvas.drawPath(traveledPath, dashPaint);
 
-    // Draw origin dot
     canvas.drawCircle(
       Offset(size.width * 0.15, size.height * 0.6),
       5,
       Paint()..color = AppTheme.textTertiary,
     );
 
-    // Draw current position (truck icon represented as a dot)
     canvas.drawCircle(
       Offset(size.width * 0.55, size.height * 0.5),
       7,
@@ -422,7 +404,6 @@ class _MapRoutePainter extends CustomPainter {
       Paint()..color = Colors.white,
     );
 
-    // Draw destination dot
     canvas.drawCircle(
       Offset(size.width * 0.85, size.height * 0.4),
       6,
@@ -434,7 +415,6 @@ class _MapRoutePainter extends CustomPainter {
       Paint()..color = Colors.white,
     );
 
-    // Draw grid lines for map effect
     final gridPaint = Paint()
       ..color = AppTheme.dividerColor.withOpacity(0.3)
       ..strokeWidth = 0.5;

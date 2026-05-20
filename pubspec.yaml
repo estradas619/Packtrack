@@ -15,26 +15,15 @@ dependencies:
   # State Management
   provider: ^6.1.1
 
-  # Maps
-  google_maps_flutter: ^2.5.3
-
   # Local Storage
   shared_preferences: ^2.2.2
-  sqflite: ^2.3.2
   path: ^1.8.3
 
   # Networking
   http: ^1.2.0
-  dio: ^5.4.0
 
   # UI Components
-  flutter_svg: ^2.0.9
   shimmer: ^3.0.0
-  cached_network_image: ^3.3.1
-  lottie: ^3.0.0
-
-  # Barcode/QR Scanner
-  mobile_scanner: ^4.0.1
 
   # Share
   share_plus: ^7.2.1

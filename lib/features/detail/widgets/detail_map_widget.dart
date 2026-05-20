@@ -1,146 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/package_model.dart';
 
 /// Expanded interactive map showing the full route of a package.
-class DetailMapWidget extends StatefulWidget {
+/// Uses a pure Flutter CustomPainter visualization (no external map package).
+class DetailMapWidget extends StatelessWidget {
   final PackageModel package;
 
   const DetailMapWidget({super.key, required this.package});
 
   @override
-  State<DetailMapWidget> createState() => _DetailMapWidgetState();
-}
-
-class _DetailMapWidgetState extends State<DetailMapWidget> {
-  GoogleMapController? _mapController;
-
-  @override
   Widget build(BuildContext context) {
-    final hasCoordinates = widget.package.currentLatitude != null &&
-        widget.package.currentLongitude != null;
-
-    if (!hasCoordinates) {
-      return _buildPlaceholderMap();
-    }
-
-    return _buildInteractiveMap();
-  }
-
-  /// Build the actual Google Maps widget with markers and polylines.
-  Widget _buildInteractiveMap() {
-    final currentPos = LatLng(
-      widget.package.currentLatitude!,
-      widget.package.currentLongitude!,
-    );
-
-    final destPos = widget.package.destinationLatitude != null
-        ? LatLng(
-            widget.package.destinationLatitude!,
-            widget.package.destinationLongitude!,
-          )
-        : currentPos;
-
-    // Create markers for each tracking event with coordinates
-    final markers = <Marker>{};
-    final polylinePoints = <LatLng>[];
-
-    // Origin marker
-    if (widget.package.events.isNotEmpty) {
-      final firstEvent = widget.package.events.first;
-      if (firstEvent.latitude != null && firstEvent.longitude != null) {
-        markers.add(Marker(
-          markerId: const MarkerId('origin'),
-          position: LatLng(firstEvent.latitude!, firstEvent.longitude!),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-          infoWindow: InfoWindow(title: firstEvent.location),
-        ));
-        polylinePoints.add(LatLng(firstEvent.latitude!, firstEvent.longitude!));
-      }
-    }
-
-    // Intermediate event markers
-    for (final event in widget.package.events) {
-      if (event.latitude != null && event.longitude != null) {
-        polylinePoints.add(LatLng(event.latitude!, event.longitude!));
-      }
-    }
-
-    // Current position marker (truck)
-    markers.add(Marker(
-      markerId: const MarkerId('current'),
-      position: currentPos,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-      infoWindow: const InfoWindow(title: 'Current Location'),
-    ));
-    polylinePoints.add(currentPos);
-
-    // Destination marker
-    markers.add(Marker(
-      markerId: const MarkerId('destination'),
-      position: destPos,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-      infoWindow: InfoWindow(
-        title: widget.package.destination ?? 'Destination',
-      ),
-    ));
-
-    // Polyline for the route
-    final polylines = <Polyline>{
-      Polyline(
-        polylineId: const PolylineId('route'),
-        points: polylinePoints,
-        color: AppTheme.primaryColor,
-        width: 3,
-        patterns: [PatternItem.dash(20), PatternItem.gap(10)],
-      ),
-    };
-
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: currentPos,
-        zoom: 10,
-      ),
-      markers: markers,
-      polylines: polylines,
-      onMapCreated: (controller) {
-        _mapController = controller;
-        // Fit bounds to show all markers
-        _fitBounds(markers);
-      },
-      myLocationEnabled: false,
-      zoomControlsEnabled: false,
-      mapToolbarEnabled: false,
-      compassEnabled: false,
-      liteModeEnabled: false,
-    );
-  }
-
-  /// Fit the map to show all markers.
-  void _fitBounds(Set<Marker> markers) {
-    if (markers.length < 2 || _mapController == null) return;
-
-    double minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-
-    for (final marker in markers) {
-      final pos = marker.position;
-      if (pos.latitude < minLat) minLat = pos.latitude;
-      if (pos.latitude > maxLat) maxLat = pos.latitude;
-      if (pos.longitude < minLng) minLng = pos.longitude;
-      if (pos.longitude > maxLng) maxLng = pos.longitude;
-    }
-
-    _mapController!.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(minLat, minLng),
-          northeast: LatLng(maxLat, maxLng),
-        ),
-        50,
-      ),
-    );
+    return _buildPlaceholderMap();
   }
 
   /// Placeholder map with visual route representation.
@@ -166,8 +38,8 @@ class _DetailMapWidgetState extends State<DetailMapWidget> {
           // Route visualization
           CustomPaint(
             painter: _DetailRoutePainter(
-              events: widget.package.events,
-              status: widget.package.status,
+              events: package.events,
+              status: package.status,
             ),
             size: Size.infinite,
           ),
@@ -192,7 +64,7 @@ class _DetailMapWidgetState extends State<DetailMapWidget> {
                 children: [
                   Icon(
                     Icons.local_shipping_rounded,
-                    color: _getStatusColor(widget.package.status),
+                    color: _getStatusColor(package.status),
                     size: 20,
                   ),
                   const SizedBox(width: 10),
@@ -202,7 +74,7 @@ class _DetailMapWidgetState extends State<DetailMapWidget> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          widget.package.origin ?? 'Origin',
+                          package.origin ?? 'Origin',
                           style: const TextStyle(
                             fontSize: 11,
                             color: AppTheme.textTertiary,
@@ -210,7 +82,7 @@ class _DetailMapWidgetState extends State<DetailMapWidget> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          widget.package.destination ?? 'Destination',
+                          package.destination ?? 'Destination',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -226,16 +98,16 @@ class _DetailMapWidgetState extends State<DetailMapWidget> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(widget.package.status)
+                      color: _getStatusColor(package.status)
                           .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '${(widget.package.status.progress * 100).toInt()}%',
+                      '${(package.status.progress * 100).toInt()}%',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: _getStatusColor(widget.package.status),
+                        color: _getStatusColor(package.status),
                       ),
                     ),
                   ),
@@ -265,12 +137,6 @@ class _DetailMapWidgetState extends State<DetailMapWidget> {
       case PackageStatus.unknown:
         return AppTheme.textTertiary;
     }
-  }
-
-  @override
-  void dispose() {
-    _mapController?.dispose();
-    super.dispose();
   }
 }
 
@@ -331,7 +197,7 @@ class _DetailRoutePainter extends CustomPainter {
     // Generate points along a curve
     final points = <Offset>[];
     for (var i = 0; i < totalStops; i++) {
-      final t = i / (totalStops - 1);
+      final t = i / (totalStops - 1).clamp(1, totalStops);
       final x = size.width * 0.1 + (size.width * 0.8 * t);
       final y = size.height * 0.5 +
           (size.height * 0.15 * (i.isEven ? -1 : 1)) *
