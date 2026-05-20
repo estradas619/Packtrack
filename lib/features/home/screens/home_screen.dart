@@ -6,14 +6,12 @@ import '../../../core/localization/locale_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/providers/tracking_provider.dart';
 import '../../../data/providers/search_history_provider.dart';
-import '../../../data/providers/auth_provider.dart';
 import '../widgets/smart_search_bar.dart';
 import '../widgets/live_map_carousel.dart';
 import '../widgets/order_group_card.dart';
 import '../widgets/language_selector.dart';
 import '../widgets/empty_state_widget.dart';
 import '../../extras/screens/extras_screen.dart';
-import '../../auth/screens/welcome_screen.dart';
 
 /// Main home screen with search bar, live map, and grouped orders.
 /// Completely clean — no ads, no clutter. Only packages.
@@ -38,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
       backgroundColor: AppTheme.surfaceColor,
@@ -51,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
               parent: BouncingScrollPhysics(),
             ),
             slivers: [
-              // ─── Header with User Avatar + Language Selector ───────────
+              // ─── Header with Language Selector + Profile ─────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
@@ -66,14 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               l10n.homeTitle,
                               style: Theme.of(context).textTheme.headlineMedium,
                             ),
-                            if (authProvider.isSignedIn)
-                              Text(
-                                authProvider.displayName,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppTheme.textTertiary,
-                                ),
-                              ),
                           ],
                         ),
                       ),
@@ -81,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const LanguageSelector(),
                       const SizedBox(width: 8),
                       // Profile / Extras menu
-                      _ProfileMenu(authProvider: authProvider),
+                      const _ProfileMenu(),
                     ],
                   ),
                 ),
@@ -201,11 +190,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Profile menu button with dropdown for Extras and Sign Out.
+/// Profile menu button with dropdown for Extras.
 class _ProfileMenu extends StatelessWidget {
-  final AuthProvider authProvider;
-
-  const _ProfileMenu({required this.authProvider});
+  const _ProfileMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -223,25 +210,11 @@ class _ProfileMenu extends StatelessWidget {
           color: AppTheme.primaryColor.withOpacity(0.1),
           shape: BoxShape.circle,
         ),
-        child: authProvider.photoUrl != null
-            ? ClipOval(
-                child: Image.network(
-                  authProvider.photoUrl!,
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.person_rounded,
-                    size: 18,
-                    color: AppTheme.primaryColor,
-                  ),
-                ),
-              )
-            : const Icon(
-                Icons.person_rounded,
-                size: 18,
-                color: AppTheme.primaryColor,
-              ),
+        child: const Icon(
+          Icons.person_rounded,
+          size: 18,
+          color: AppTheme.primaryColor,
+        ),
       ),
       onSelected: (value) => _handleMenuAction(context, value),
       itemBuilder: (context) => [
@@ -265,20 +238,6 @@ class _ProfileMenu extends StatelessWidget {
             ],
           ),
         ),
-        const PopupMenuDivider(),
-        PopupMenuItem(
-          value: 'signout',
-          child: Row(
-            children: [
-              const Icon(Icons.logout_rounded, size: 18, color: AppTheme.errorColor),
-              const SizedBox(width: 10),
-              Text(
-                l10n.translate('sign_out'),
-                style: const TextStyle(color: AppTheme.errorColor),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -294,43 +253,6 @@ class _ProfileMenu extends StatelessWidget {
       case 'settings':
         // TODO: Navigate to settings screen
         break;
-      case 'signout':
-        _handleSignOut(context);
-        break;
     }
-  }
-
-  void _handleSignOut(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(AppLocalizations.of(context)!.translate('sign_out_confirm')),
-        content: Text(AppLocalizations.of(context)!.translate('sign_out_message')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(AppLocalizations.of(context)!.translate('cancel')),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<AuthProvider>().signOut();
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                (route) => false,
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.errorColor,
-            ),
-            child: Text(AppLocalizations.of(context)!.translate('sign_out')),
-          ),
-        ],
-      ),
-    );
   }
 }

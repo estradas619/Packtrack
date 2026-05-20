@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/localization/app_localizations.dart';
-import '../../../data/providers/auth_provider.dart';
 import '../widgets/premium_card.dart';
 import '../widgets/micro_insurance_card.dart';
 import '../widgets/affiliate_offers_card.dart';
@@ -20,8 +18,6 @@ class ExtrasScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // ignore: unused_local_variable
-    final authProvider = context.watch<AuthProvider>();
 
     return Scaffold(
       backgroundColor: AppTheme.surfaceColor,

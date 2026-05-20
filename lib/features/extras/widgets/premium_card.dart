@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/localization/app_localizations.dart';
-import '../../../data/providers/auth_provider.dart';
 
 /// Premium subscription card with features and pricing.
 class PremiumCard extends StatelessWidget {
@@ -12,7 +10,7 @@ class PremiumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isPremium = context.watch<AuthProvider>().isPremium;
+    const isPremium = false; // Demo mode: not premium
 
     return Container(
       decoration: BoxDecoration(
@@ -65,14 +63,6 @@ class PremiumCard extends StatelessWidget {
                         color: Colors.white,
                       ),
                     ),
-                    if (isPremium)
-                      Text(
-                        l10n.translate('premium_active'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white.withOpacity(0.8),
-                        ),
-                      ),
                   ],
                 ),
                 const Spacer(),
@@ -148,7 +138,6 @@ class PremiumCard extends StatelessWidget {
   }
 
   void _handleSubscribe(BuildContext context) {
-    // TODO: Integrate with in_app_purchase
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Premium subscription coming soon!'),
