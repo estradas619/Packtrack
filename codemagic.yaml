@@ -13,8 +13,10 @@ workflows:
       - name: Build APK (debug)
         script: |
           flutter build apk --debug
-          echo "APK location:"
-          find build -name "*.apk" -type f
+          mkdir -p $CM_BUILD_DIR/artifacts
+          find build -name "*.apk" -type f -exec cp {} $CM_BUILD_DIR/artifacts/ \;
+          ls -la $CM_BUILD_DIR/artifacts/
     artifacts:
+      - artifacts/*.apk
       - build/**/*.apk
       - build/**/*.aab
